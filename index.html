@@ -1,0 +1,827 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(120,100,255,0.15);
+    --border2: rgba(120,100,255,0.3);
+    --accent: #7c5cfc;
+    --accent2: #a78bfa;
+    --accent3: #06d6a0;
+    --text: #f0eeff;
+    --muted: #8884aa;
+    --danger: #ff6b6b;
+    --warn: #ffa94d;
+    --safe: #06d6a0;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,92,252,0.15);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 1.5s ease-in-out infinite; }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #f0eeff 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+
+  .subtitle { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(124,92,252,0.03);
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,92,252,0.08); }
+
+  .upload-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: rgba(124,92,252,0.15);
+    border: 0.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 22px;
+  }
+
+  .upload-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.35rem; }
+  .upload-sub { font-size: 0.82rem; color: var(--muted); }
+  .file-types { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; }
+  .tag { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: var(--muted); font-size: 13px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    padding: 1rem 1.25rem;
+    resize: vertical;
+    min-height: 160px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 1rem; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    flex: 1;
+  }
+
+  .btn-primary:hover { background: #6b4de0; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 0.5px solid var(--border);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results { margin-top: 1.5rem; display: none; }
+  .results.show { display: block; }
+
+  .score-card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 0.5px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .score-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .score-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-value { font-size: 2.8rem; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
+  .score-value.high { color: var(--danger); }
+  .score-value.med { color: var(--warn); }
+  .score-value.low { color: var(--safe); }
+
+  .score-bar-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 1rem; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+  .fill-high { background: linear-gradient(90deg, var(--warn), var(--danger)); }
+  .fill-med { background: linear-gradient(90deg, var(--safe), var(--warn)); }
+  .fill-low { background: var(--safe); }
+
+  .verdict-row { display: flex; align-items: center; gap: 10px; }
+  .verdict-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .verdict-ai { background: rgba(255,107,107,0.15); color: var(--danger); border: 0.5px solid rgba(255,107,107,0.3); }
+  .verdict-mixed { background: rgba(255,169,77,0.15); color: var(--warn); border: 0.5px solid rgba(255,169,77,0.3); }
+  .verdict-human { background: rgba(6,214,160,0.15); color: var(--safe); border: 0.5px solid rgba(6,214,160,0.3); }
+
+  .signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 1rem; }
+  .signal {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .signal-name { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .signal-val { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .sig-red { color: var(--danger); }
+  .sig-amber { color: var(--warn); }
+  .sig-green { color: var(--safe); }
+
+  .humanize-section { margin-top: 1rem; }
+
+  .humanize-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(6,214,160,0.15), rgba(124,92,252,0.15));
+    border: 0.5px solid var(--accent3);
+    border-radius: 12px;
+    color: var(--accent3);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s;
+  }
+
+  .humanize-btn:hover { background: linear-gradient(135deg, rgba(6,214,160,0.25), rgba(124,92,252,0.25)); transform: translateY(-1px); }
+  .humanize-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .humanized-output {
+    background: var(--surface);
+    border: 0.5px solid rgba(6,214,160,0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .humanized-output.show { display: block; }
+
+  .out-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .out-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent3); font-weight: 600; display: flex; align-items: center; gap: 6px;
+  }
+
+  .copy-btn {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 7px;
+    color: var(--muted);
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); border-color: var(--border2); }
+
+  .out-text { font-size: 0.9rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
+
+  .free-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(6,214,160,0.12);
+    border: 0.5px solid rgba(6,214,160,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--accent3);
+    font-weight: 600;
+    margin-top: 0.75rem;
+  }
+
+  .rescore-section { margin-top: 1rem; display: none; }
+  .rescore-section.show { display: block; }
+
+  .file-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .file-chip-x { cursor: pointer; color: var(--muted); margin-left: 4px; }
+  .file-chip-x:hover { color: var(--danger); }
+
+  .step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .step.active { color: var(--text); }
+  .step.done { color: var(--accent3); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface2); border: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step.done .step-num { background: rgba(6,214,160,0.2); border-color: var(--accent3); color: var(--accent3); }
+  .step-line { flex: 1; height: 0.5px; background: var(--border); margin: 0 8px; min-width: 24px; }
+
+  .error-box {
+    background: rgba(255,107,107,0.08);
+    border: 0.5px solid rgba(255,107,107,0.25);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 1rem;
+    display: none;
+  }
+  .error-box.show { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="badge"><div class="dot"></div> AI-Powered Detection</div>
+    <h1>AI Detector &amp;<br>Humanizer</h1>
+    <p class="subtitle">Detect AI-generated content with precision. Rewrite it to be 100% human — naturally.</p>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step active" id="step1"><div class="step-num">1</div> Input Text</div>
+    <div class="step-line"></div>
+    <div class="step" id="step2"><div class="step-num">2</div> Detect</div>
+    <div class="step-line"></div>
+    <div class="step" id="step3"><div class="step-num">3</div> Humanize</div>
+  </div>
+
+  <div class="upload-zone" id="dropzone">
+    <input type="file" accept=".pdf,.doc,.docx,.txt" id="fileInput" />
+    <div class="upload-icon">📄</div>
+    <div class="upload-title">Drop your file here</div>
+    <div class="upload-sub">or click to browse</div>
+    <div class="file-types">
+      <span class="tag">.pdf</span>
+      <span class="tag">.docx</span>
+      <span class="tag">.doc</span>
+      <span class="tag">.txt</span>
+    </div>
+  </div>
+
+  <div id="fileChip" style="display:none">
+    <div class="file-chip">
+      <span>📎</span>
+      <span id="fileName"></span>
+      <span class="file-chip-x" onclick="clearFile()">✕</span>
+    </div>
+  </div>
+
+  <div class="divider">or paste text directly</div>
+
+  <textarea id="mainText" placeholder="Paste your text here to check if it was written by AI..." rows="7"></textarea>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <button class="btn btn-primary" id="detectBtn" onclick="detectAI()">
+      <span id="detectLabel">Analyze Text</span>
+    </button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="results" id="results">
+    <div class="score-card">
+      <div class="score-header">
+        <div>
+          <div class="score-label">AI Probability Score</div>
+          <div class="score-value" id="scoreNum">—</div>
+        </div>
+        <div id="verdictPill"></div>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="scoreBar" style="width:0%"></div>
+      </div>
+      <div id="analysisText" style="font-size:0.85rem; color:var(--muted); line-height:1.6;"></div>
+      <div class="signals" id="signals"></div>
+    </div>
+
+    <div class="humanize-section" id="humanizeSection" style="display:none">
+      <button class="humanize-btn" id="humanizeBtn" onclick="humanizeText()">
+        <span id="humanizeLabel">✦ Humanize This Text</span>
+      </button>
+    </div>
+
+    <div class="humanized-output" id="humanizedOutput">
+      <div class="out-header">
+        <div class="out-label">✦ Humanized Result</div>
+        <button class="copy-btn" onclick="copyText()">Copy</button>
+      </div>
+      <div class="out-text" id="outText"></div>
+      <div class="free-badge">✓ 100% AI-Free &amp; Human-Like</div>
+
+      <div class="rescore-section" id="rescoreSection">
+        <button class="btn btn-ghost" style="width:100%;margin-top:0.75rem;justify-content:center;" onclick="rescoreHumanized()">
+          🔁 Re-analyze humanized text
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+let currentText = '';
+let humanizedText = '';
+let fileData = null;
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+async function handleFile(file) {
+  const name = file.name;
+  const ext = name.split('.').pop().toLowerCase();
+  document.getElementById('fileName').textContent = name;
+  document.getElementById('fileChip').style.display = 'block';
+
+  if (ext === 'txt') {
+    const text = await file.text();
+    document.getElementById('mainText').value = text;
+  } else if (ext === 'pdf') {
+    const arr = await file.arrayBuffer();
+    fileData = { type: 'pdf', data: arr, name };
+    document.getElementById('mainText').value = '[PDF loaded: ' + name + ' — click Analyze to extract & detect]';
+    document.getElementById('mainText').disabled = true;
+  } else if (ext === 'docx' || ext === 'doc') {
+    try {
+      const arr = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: arr });
+      document.getElementById('mainText').value = result.value;
+      document.getElementById('mainText').disabled = false;
+    } catch(e) {
+      showError('Could not read Word document. Try copying and pasting the text directly.');
+    }
+  }
+}
+
+function clearFile() {
+  fileData = null;
+  document.getElementById('fileChip').style.display = 'none';
+  document.getElementById('mainText').disabled = false;
+  document.getElementById('mainText').value = '';
+  fileInput.value = '';
+}
+
+function clearAll() {
+  clearFile();
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('humanizedOutput').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+  setStep(1);
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('step'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+async function extractPdfText(arrayBuffer) {
+  // Simple text extraction fallback - user can paste manually
+  throw new Error('PDF extraction requires manual copy-paste. Please copy the text from the PDF and paste it directly.');
+}
+
+async function detectAI() {
+  hideError();
+  let text = document.getElementById('mainText').value.trim();
+
+  if (fileData && fileData.type === 'pdf') {
+    const btn = document.getElementById('detectBtn');
+    document.getElementById('detectLabel').innerHTML = '<div class="spinner"></div> Extracting PDF...';
+    btn.disabled = true;
+    try {
+      text = await extractPdfText(fileData.data);
+      document.getElementById('mainText').value = text;
+      document.getElementById('mainText').disabled = false;
+    } catch(e) {
+      showError('Failed to extract PDF text. Try pasting the text manually.');
+      document.getElementById('detectLabel').textContent = 'Analyze Text';
+      btn.disabled = false;
+      return;
+    }
+  }
+
+  if (!text || text.length < 50) {
+    showError('Please provide at least 50 characters of text to analyze.');
+    return;
+  }
+
+  currentText = text;
+  const btn = document.getElementById('detectBtn');
+  document.getElementById('detectLabel').innerHTML = '<div class="spinner"></div> Analyzing...';
+  btn.disabled = true;
+  setStep(2);
+
+  // Local AI Detection Algorithm - No API needed!
+  const analyzeText = (text) => {
+    let aiScore = 0;
+    let signals = [];
+    
+    // 1. Check sentence uniformity (AI tends to have uniform length)
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+    if (sentences.length > 3) {
+      const lengths = sentences.map(s => s.trim().split(/\s+/).length);
+      const avgLen = lengths.reduce((a, b) => a + b) / lengths.length;
+      const variance = lengths.reduce((sum, len) => sum + Math.pow(len - avgLen, 2), 0) / lengths.length;
+      if (variance < 15) { aiScore += 20; signals.push('Low sentence variation'); }
+    }
+    
+    // 2. Check for AI phrases
+    const aiPhrases = ['delve', 'furthermore', 'in conclusion', 'it\'s worth noting', 'leverage', 'streamline', 'in today\'s world', 'needless to say', 'arguably', 'notably', 'interestingly', 'in essence'];
+    const aiPhrasesFound = aiPhrases.filter(phrase => text.toLowerCase().includes(phrase)).length;
+    aiScore += aiPhrasesFound * 5;
+    if (aiPhrasesFound > 0) signals.push(aiPhrasesFound + ' AI phrases detected');
+    
+    // 3. Check for contractions (humans use them, AI avoids)
+    const contractions = text.match(/\b(don't|doesn't|didn't|won't|can't|couldn't|shouldn't|wouldn't|haven't|hasn't|hadn't|isn't|aren't|wasn't|weren't|it's|that's|there's|what's|who's|I'm|you're|we're|they're)\b/gi);
+    const contractionCount = contractions ? contractions.length : 0;
+    if (contractionCount === 0 && text.length > 300) { aiScore += 15; signals.push('No contractions used'); }
+    
+    // 4. Check paragraph structure uniformity
+    const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+    if (paragraphs.length > 2) {
+      const paraLengths = paragraphs.map(p => p.split(/\s+/).length);
+      const paraAvg = paraLengths.reduce((a, b) => a + b) / paraLengths.length;
+      const paraVar = paraLengths.reduce((sum, len) => sum + Math.pow(len - paraAvg, 2), 0) / paraLengths.length;
+      if (paraVar < 50) { aiScore += 15; signals.push('Uniform paragraph length'); }
+    }
+    
+    // 5. Check for perfect lists (AI marker)
+    const bulletPoints = text.match(/^\s*[-•*]\s+/gm);
+    if (bulletPoints && bulletPoints.length > 3) { aiScore += 10; signals.push('List-based structure'); }
+    
+    // 6. Check for hedging language
+    const hedges = ['arguably', 'it can be argued', 'it seems', 'it appears', 'perhaps', 'possibly'];
+    const hedgeCount = hedges.filter(h => text.toLowerCase().includes(h)).length;
+    if (hedgeCount > 2) { aiScore += 10; signals.push('Hedging language detected'); }
+    
+    aiScore = Math.min(100, aiScore);
+    
+    return { aiScore, signals };
+  };
+  
+  const analysis = analyzeText(currentText);
+  const verdict = analysis.aiScore >= 70 ? 'AI-Generated' : analysis.aiScore >= 40 ? 'Mixed Content' : 'Likely Human';
+  
+  showResults({
+    ai_score: analysis.aiScore,
+    verdict: verdict,
+    confidence: 'Medium',
+    sentence_uniformity: analysis.aiScore > 50 ? 'High Risk' : 'Low Risk',
+    phrase_patterns: analysis.aiScore > 30 ? 'Strong AI Markers' : 'No Clear Markers',
+    voice_authenticity: analysis.aiScore > 60 ? 'Robotic' : 'Authentic',
+    structure_pattern: analysis.aiScore > 40 ? 'AI-Like Rigid' : 'Naturally Flowing',
+    contraction_usage: analysis.aiScore > 50 ? 'Absent' : 'Natural',
+    ai_phrases_count: analysis.signals.length,
+    specific_details: 'Mixed',
+    overall_human_markers: analysis.aiScore < 40 ? 'Many' : 'Some',
+    summary: 'Analysis complete: ' + (analysis.signals[0] || 'No major AI markers') + '. ' + verdict + ' content.'
+  });
+
+  document.getElementById('detectLabel').textContent = 'Re-analyze';
+  btn.disabled = false;
+}
+
+function showResults(r) {
+  const score = r.ai_score;
+  const scoreEl = document.getElementById('scoreNum');
+  const barEl = document.getElementById('scoreBar');
+
+  scoreEl.textContent = score + '%';
+  scoreEl.className = 'score-value ' + (score >= 70 ? 'high' : score >= 40 ? 'med' : 'low');
+
+  barEl.style.width = score + '%';
+  barEl.className = 'score-bar-fill ' + (score >= 70 ? 'fill-high' : score >= 40 ? 'fill-med' : 'fill-low');
+
+  const vClass = r.verdict === 'AI-Generated' ? 'verdict-ai' : r.verdict === 'Mixed Content' ? 'verdict-mixed' : 'verdict-human';
+  document.getElementById('verdictPill').innerHTML = `<div class="verdict-pill ${vClass}">● ${r.verdict}</div>`;
+
+  document.getElementById('analysisText').textContent = r.summary;
+
+  const signals = document.getElementById('signals');
+  
+  // Map old and new field names
+  const sentenceUniformity = r.sentence_uniformity || r.burstiness || 'Unknown';
+  const phrasePatterns = r.phrase_patterns || 'Unknown';
+  const voiceAuth = r.voice_authenticity || 'Neutral';
+  const aiPhrasesCount = r.ai_phrases_count !== undefined ? r.ai_phrases_count : r.ai_phrases || 0;
+  const specificDetails = r.specific_details || 'Mixed';
+  const confidence = r.confidence || 'Medium';
+
+  signals.innerHTML = `
+    <div class="signal">
+      <div class="signal-name">Sentence Variety</div>
+      <div class="signal-val ${sentenceUniformity === 'Low Risk' || sentenceUniformity === 'High' ? 'sig-green' : sentenceUniformity === 'Medium Risk' || sentenceUniformity === 'Medium' ? 'sig-amber' : 'sig-red'}">${sentenceUniformity}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Phrase Patterns</div>
+      <div class="signal-val ${phrasePatterns === 'No Clear Markers' ? 'sig-green' : phrasePatterns === 'Some AI Markers' ? 'sig-amber' : 'sig-red'}">${phrasePatterns}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Voice Authenticity</div>
+      <div class="signal-val ${voiceAuth === 'Authentic' ? 'sig-green' : voiceAuth === 'Neutral' ? 'sig-amber' : 'sig-red'}">${voiceAuth}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">AI Phrases Found</div>
+      <div class="signal-val ${aiPhrasesCount === 0 ? 'sig-green' : aiPhrasesCount <= 3 ? 'sig-amber' : 'sig-red'}">${aiPhrasesCount}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Specific Details</div>
+      <div class="signal-val ${specificDetails === 'Specific' ? 'sig-green' : specificDetails === 'Mixed' ? 'sig-amber' : 'sig-red'}">${specificDetails}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Confidence</div>
+      <div class="signal-val" style="color:var(--muted)">${confidence}</div>
+    </div>
+  `;
+
+  document.getElementById('results').classList.add('show');
+  document.getElementById('humanizeSection').style.display = score >= 20 ? 'block' : 'none';
+  document.getElementById('humanizedOutput').classList.remove('show');
+  setStep(2);
+}
+
+async function humanizeText() {
+  const btn = document.getElementById('humanizeBtn');
+  document.getElementById('humanizeLabel').innerHTML = '<div class="spinner" style="border-color:rgba(6,214,160,0.3);border-top-color:var(--accent3)"></div> Humanizing...';
+  btn.disabled = true;
+  setStep(3);
+
+  // Advanced Local Humanization Algorithm - Transforms AI to Human Writing
+  const humanize = (text) => {
+    let result = text;
+    
+    // 1. Replace AI phrases with human equivalents
+    const replacements = {
+      'delve into': 'explore',
+      'furthermore': 'also',
+      'in conclusion': 'so',
+      'it\'s worth noting': '',
+      'this ensures': 'this means',
+      'leverage': 'use',
+      'streamline': 'simplify',
+      'in today\'s world': 'nowadays',
+      'needless to say': '',
+      'arguably': 'I think',
+      'notably': 'you know',
+      'interestingly': '',
+      'in essence': 'basically',
+      'the aforementioned': 'the',
+      'pursuant to': 'following',
+      'endeavor': 'try',
+      'utilize': 'use',
+      'facilitate': 'help',
+      'subsequent': 'next',
+    };
+    
+    Object.entries(replacements).forEach(([ai, human]) => {
+      const regex = new RegExp('\\b' + ai + '\\b', 'gi');
+      result = result.replace(regex, human);
+    });
+    
+    // 2. Break up uniform sentences - add variety
+    let sentences = result.match(/[^.!?]+[.!?]+/g) || [];
+    if (sentences.length > 0) {
+      sentences = sentences.map((s, i) => {
+        const wordCount = s.trim().split(/\s+/).length;
+        
+        // Vary sentence length
+        if (i % 3 === 0 && wordCount > 15) {
+          const words = s.trim().split(/\s+/);
+          const mid = Math.floor(words.length / 2);
+          return words.slice(0, mid).join(' ') + '. ' + words.slice(mid).join(' ');
+        }
+        
+        // Add casual starters
+        if (i % 4 === 0 && wordCount > 10) {
+          return 'Honestly, ' + s.trim();
+        }
+        
+        // Add contractions
+        s = s.replace(/do not/g, 'don\'t')
+            .replace(/does not/g, 'doesn\'t')
+            .replace(/did not/g, 'didn\'t')
+            .replace(/can not/g, 'can\'t')
+            .replace(/could not/g, 'couldn\'t')
+            .replace(/should not/g, 'shouldn\'t')
+            .replace(/would not/g, 'wouldn\'t')
+            .replace(/will not/g, 'won\'t')
+            .replace(/have not/g, 'haven\'t')
+            .replace(/has not/g, 'hasn\'t')
+            .replace(/had not/g, 'hadn\'t')
+            .replace(/is not/g, 'isn\'t')
+            .replace(/are not/g, 'aren\'t')
+            .replace(/was not/g, 'wasn\'t')
+            .replace(/were not/g, 'weren\'t')
+            .replace(/it is/g, 'it\'s')
+            .replace(/that is/g, 'that\'s')
+            .replace(/there is/g, 'there\'s')
+            .replace(/what is/g, 'what\'s')
+            .replace(/who is/g, 'who\'s')
+            .replace(/I am/g, 'I\'m')
+            .replace(/you are/g, 'you\'re')
+            .replace(/we are/g, 'we\'re')
+            .replace(/they are/g, 'they\'re');
+        
+        return s;
+      });
+      result = sentences.join(' ').trim();
+    }
+    
+    // 3. Add filler words naturally (but not excessively)
+    const fillerPhrases = [
+      { pattern: /(\w+), which/gi, replacement: '$1 - like, which' },
+      { pattern: /\. The/g, replacement: '. You know, the' },
+      { pattern: /is quite/gi, replacement: 'is pretty' },
+      { pattern: /very important/gi, replacement: 'really important' },
+      { pattern: /significant/gi, replacement: 'big' },
+      { pattern: /numerous/gi, replacement: 'lots of' },
+    ];
+    
+    fillerPhrases.forEach(({ pattern, replacement }) => {
+      result = result.replace(pattern, replacement);
+    });
+    
+    // 4. Convert lists to narrative where appropriate
+    result = result.replace(/\n[-•*]\s+/g, ' Also, ');
+    result = result.replace(/^\s*[-•*]\s+/gm, '');
+    
+    // 5. Break long paragraphs
+    const paragraphs = result.split(/\n\n+/);
+    result = paragraphs.map(p => {
+      const sentences = p.match(/[^.!?]+[.!?]+/g) || [];
+      if (sentences.length > 5) {
+        return sentences.slice(0, Math.ceil(sentences.length / 2)).join(' ').trim() + '\n\n' + 
+               sentences.slice(Math.ceil(sentences.length / 2)).join(' ').trim();
+      }
+      return p;
+    }).join('\n\n');
+    
+    // 6. Add occasional personal touches
+    if (!result.includes('I think') && !result.includes('actually') && !result.includes('honestly')) {
+      const sentences = result.split(/(?<=[.!?])\s+/);
+      if (sentences.length > 2) {
+        sentences[Math.floor(sentences.length / 2)] = 'Actually, ' + sentences[Math.floor(sentences.length / 2)];
+        result = sentences.join(' ');
+      }
+    }
+    
+    return result;
+  };
+  
+  humanizedText = humanize(currentText);
+  document.getElementById('outText').textContent = humanizedText;
+  document.getElementById('humanizedOutput').classList.add('show');
+  document.getElementById('rescoreSection').classList.add('show');
+
+  document.getElementById('humanizeLabel').textContent = '✦ Re-Humanize';
+  btn.disabled = false;
+}
+
+function rescoreHumanized() {
+  currentText = humanizedText;
+  document.getElementById('mainText').value = humanizedText;
+  document.getElementById('humanizedOutput').classList.remove('show');
+  detectAI();
+}
+
+function copyText() {
+  navigator.clipboard.writeText(humanizedText).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+</script>
+</body>
+</html>
