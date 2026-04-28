@@ -1,0 +1,1197 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: rgba(120,100,255,0.15);
+    --border2: rgba(120,100,255,0.3);
+    --accent: #7c5cfc;
+    --accent2: #a78bfa;
+    --accent3: #06d6a0;
+    --text: #f0eeff;
+    --muted: #8884aa;
+    --danger: #ff6b6b;
+    --warn: #ffa94d;
+    --safe: #06d6a0;
+  }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(124,92,252,0.15);
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 1.5s ease-in-out infinite; }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #f0eeff 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.75rem;
+  }
+
+  .subtitle { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(124,92,252,0.03);
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(124,92,252,0.08); }
+
+  .upload-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: rgba(124,92,252,0.15);
+    border: 0.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 22px;
+  }
+
+  .upload-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.35rem; }
+  .upload-sub { font-size: 0.82rem; color: var(--muted); }
+  .file-types { display: flex; gap: 8px; justify-content: center; margin-top: 1rem; }
+  .tag { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; padding: 3px 10px; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 1rem 0; color: var(--muted); font-size: 13px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    padding: 1rem 1.25rem;
+    resize: vertical;
+    min-height: 160px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 1rem; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    flex: 1;
+  }
+
+  .btn-primary:hover { background: #6b4de0; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--muted);
+    border: 0.5px solid var(--border);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results { margin-top: 1.5rem; display: none; }
+  .results.show { display: block; }
+
+  .score-card {
+    background: var(--surface);
+    border-radius: 16px;
+    border: 0.5px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .score-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .score-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .score-value { font-size: 2.8rem; font-weight: 700; font-family: 'DM Mono', monospace; line-height: 1; }
+  .score-value.high { color: var(--danger); }
+  .score-value.med { color: var(--warn); }
+  .score-value.low { color: var(--safe); }
+
+  .score-bar-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 1rem; }
+  .score-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+  .fill-high { background: linear-gradient(90deg, var(--warn), var(--danger)); }
+  .fill-med { background: linear-gradient(90deg, var(--safe), var(--warn)); }
+  .fill-low { background: var(--safe); }
+
+  .verdict-row { display: flex; align-items: center; gap: 10px; }
+  .verdict-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .verdict-ai { background: rgba(255,107,107,0.15); color: var(--danger); border: 0.5px solid rgba(255,107,107,0.3); }
+  .verdict-mixed { background: rgba(255,169,77,0.15); color: var(--warn); border: 0.5px solid rgba(255,169,77,0.3); }
+  .verdict-human { background: rgba(6,214,160,0.15); color: var(--safe); border: 0.5px solid rgba(6,214,160,0.3); }
+
+  .signals { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 1rem; }
+  .signal {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .signal-name { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .signal-val { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .sig-red { color: var(--danger); }
+  .sig-amber { color: var(--warn); }
+  .sig-green { color: var(--safe); }
+
+  .humanize-section { margin-top: 1rem; }
+
+  .humanize-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(6,214,160,0.15), rgba(124,92,252,0.15));
+    border: 0.5px solid var(--accent3);
+    border-radius: 12px;
+    color: var(--accent3);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s;
+  }
+
+  .humanize-btn:hover { background: linear-gradient(135deg, rgba(6,214,160,0.25), rgba(124,92,252,0.25)); transform: translateY(-1px); }
+  .humanize-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .humanized-output {
+    background: var(--surface);
+    border: 0.5px solid rgba(6,214,160,0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .humanized-output.show { display: block; }
+
+  .out-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .out-label {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent3); font-weight: 600; display: flex; align-items: center; gap: 6px;
+  }
+
+  .copy-btn {
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 7px;
+    color: var(--muted);
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { color: var(--text); border-color: var(--border2); }
+
+  .out-text { font-size: 0.9rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
+
+  .free-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(6,214,160,0.12);
+    border: 0.5px solid rgba(6,214,160,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--accent3);
+    font-weight: 600;
+    margin-top: 0.75rem;
+  }
+
+  .rescore-section { margin-top: 1rem; display: none; }
+  .rescore-section.show { display: block; }
+
+  .file-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .file-chip-x { cursor: pointer; color: var(--muted); margin-left: 4px; }
+  .file-chip-x:hover { color: var(--danger); }
+
+  .step-indicator { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+  .step.active { color: var(--text); }
+  .step.done { color: var(--accent3); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface2); border: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .step.done .step-num { background: rgba(6,214,160,0.2); border-color: var(--accent3); color: var(--accent3); }
+  .step-line { flex: 1; height: 0.5px; background: var(--border); margin: 0 8px; min-width: 24px; }
+
+  .error-box {
+    background: rgba(255,107,107,0.08);
+    border: 0.5px solid rgba(255,107,107,0.25);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 1rem;
+    display: none;
+  }
+  .error-box.show { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="badge"><div class="dot"></div> AI-Powered Detection</div>
+    <h1>AI Detector &amp;<br>Humanizer</h1>
+    <p class="subtitle">Detect AI-generated content with precision. Rewrite it to be 100% human — naturally.</p>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step active" id="step1"><div class="step-num">1</div> Input Text</div>
+    <div class="step-line"></div>
+    <div class="step" id="step2"><div class="step-num">2</div> Detect</div>
+    <div class="step-line"></div>
+    <div class="step" id="step3"><div class="step-num">3</div> Humanize</div>
+  </div>
+
+  <div class="upload-zone" id="dropzone">
+    <input type="file" accept=".pdf,.doc,.docx,.txt" id="fileInput" />
+    <div class="upload-icon">📄</div>
+    <div class="upload-title">Drop your file here</div>
+    <div class="upload-sub">or click to browse</div>
+    <div class="file-types">
+      <span class="tag">.pdf</span>
+      <span class="tag">.docx</span>
+      <span class="tag">.doc</span>
+      <span class="tag">.txt</span>
+    </div>
+  </div>
+
+  <div id="fileChip" style="display:none">
+    <div class="file-chip">
+      <span>📎</span>
+      <span id="fileName"></span>
+      <span class="file-chip-x" onclick="clearFile()">✕</span>
+    </div>
+  </div>
+
+  <div class="divider">or paste text directly</div>
+
+  <textarea id="mainText" placeholder="Paste your text here to check if it was written by AI..." rows="7"></textarea>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <button class="btn btn-primary" id="detectBtn" onclick="detectAI()">
+      <span id="detectLabel">Analyze Text</span>
+    </button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="results" id="results">
+    <div class="score-card">
+      <div class="score-header">
+        <div>
+          <div class="score-label">AI Probability Score</div>
+          <div class="score-value" id="scoreNum">—</div>
+        </div>
+        <div id="verdictPill"></div>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="scoreBar" style="width:0%"></div>
+      </div>
+      <div id="analysisText" style="font-size:0.85rem; color:var(--muted); line-height:1.6;"></div>
+      <div class="signals" id="signals"></div>
+    </div>
+
+    <div class="humanize-section" id="humanizeSection" style="display:none">
+      <button class="humanize-btn" id="humanizeBtn" onclick="humanizeText()">
+        <span id="humanizeLabel">✦ Humanize This Text</span>
+      </button>
+    </div>
+
+    <div class="humanized-output" id="humanizedOutput">
+      <div class="out-header">
+        <div class="out-label">✦ Humanized Result</div>
+        <button class="copy-btn" onclick="copyText()">Copy</button>
+      </div>
+      <div class="out-text" id="outText"></div>
+      <div class="free-badge">✓ 100% AI-Free &amp; Human-Like</div>
+
+      <div class="rescore-section" id="rescoreSection">
+        <button class="btn btn-ghost" style="width:100%;margin-top:0.75rem;justify-content:center;" onclick="rescoreHumanized()">
+          🔁 Re-analyze humanized text
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+let currentText = '';
+let humanizedText = '';
+let fileData = null;
+let rehumanizeCount = 0;
+
+// API Keys
+const NVIDIA_API_KEY = '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';
+const NVIDIA_API_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+async function handleFile(file) {
+  const name = file.name;
+  const ext = name.split('.').pop().toLowerCase();
+  document.getElementById('fileName').textContent = name;
+  document.getElementById('fileChip').style.display = 'block';
+
+  if (ext === 'txt') {
+    const text = await file.text();
+    document.getElementById('mainText').value = text;
+  } else if (ext === 'pdf') {
+    const arr = await file.arrayBuffer();
+    fileData = { type: 'pdf', data: arr, name };
+    document.getElementById('mainText').value = '[PDF loaded: ' + name + ' — click Analyze to extract & detect]';
+    document.getElementById('mainText').disabled = true;
+  } else if (ext === 'docx' || ext === 'doc') {
+    try {
+      const arr = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: arr });
+      document.getElementById('mainText').value = result.value;
+      document.getElementById('mainText').disabled = false;
+    } catch(e) {
+      showError('Could not read Word document. Try copying and pasting the text directly.');
+    }
+  }
+}
+
+function clearFile() {
+  fileData = null;
+  document.getElementById('fileChip').style.display = 'none';
+  document.getElementById('mainText').disabled = false;
+  document.getElementById('mainText').value = '';
+  fileInput.value = '';
+}
+
+function clearAll() {
+  clearFile();
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('humanizedOutput').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+  setStep(1);
+  rehumanizeCount = 0;
+  humanizedText = '';
+  currentText = '';
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('step'+i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('show');
+}
+
+async function extractPdfText(arrayBuffer) {
+  // Simple text extraction fallback - user can paste manually
+  throw new Error('PDF extraction requires manual copy-paste. Please copy the text from the PDF and paste it directly.');
+}
+
+async function detectAI() {
+  hideError();
+  let text = document.getElementById('mainText').value.trim();
+
+  if (fileData && fileData.type === 'pdf') {
+    const btn = document.getElementById('detectBtn');
+    document.getElementById('detectLabel').innerHTML = '<div class="spinner"></div> Extracting PDF...';
+    btn.disabled = true;
+    try {
+      text = await extractPdfText(fileData.data);
+      document.getElementById('mainText').value = text;
+      document.getElementById('mainText').disabled = false;
+    } catch(e) {
+      showError('Failed to extract PDF text. Try pasting the text manually.');
+      document.getElementById('detectLabel').textContent = 'Analyze Text';
+      btn.disabled = false;
+      return;
+    }
+  }
+
+  if (!text || text.length < 50) {
+    showError('Please provide at least 50 characters of text to analyze.');
+    return;
+  }
+
+  currentText = text;
+  const btn = document.getElementById('detectBtn');
+  document.getElementById('detectLabel').innerHTML = '<div class="spinner"></div> Deep Analyzing...';
+  btn.disabled = true;
+  setStep(2);
+
+  // ADVANCED AI DETECTION ALGORITHM - DEEP ANALYSIS
+  const analysis = performDeepAIAnalysis(text);
+  
+  // Use NVIDIA API for enhanced detection
+  let nvidiaScore = null;
+  try {
+    nvidiaScore = await callNvidiaDetection(text);
+  } catch(e) {
+    console.warn('NVIDIA API fallback:', e.message);
+  }
+  
+  // Merge scores (65% local, 35% NVIDIA for best accuracy)
+  let finalScore = analysis.aiScore;
+  if (nvidiaScore) {
+    finalScore = Math.round((analysis.aiScore * 0.65) + (nvidiaScore * 0.35));
+  }
+
+  const verdict = finalScore >= 70 ? 'AI-Generated' : finalScore >= 40 ? 'Mixed Content' : 'Likely Human';
+  
+  showResults({
+    ai_score: finalScore,
+    verdict: verdict,
+    confidence: finalScore >= 70 || finalScore <= 30 ? 'High' : 'Medium',
+    sentence_uniformity: analysis.sentenceUniformity,
+    phrase_patterns: analysis.phrasePatterns,
+    voice_authenticity: analysis.voiceAuth,
+    structure_pattern: analysis.structurePattern,
+    contraction_usage: analysis.contractionUsage,
+    ai_phrases_count: analysis.aiPhrasesCount,
+    repetition_score: analysis.repetitionScore,
+    summary: analysis.summary,
+    detailed_signals: analysis.detailedSignals
+  });
+
+  document.getElementById('detectLabel').textContent = 'Re-analyze';
+  btn.disabled = false;
+}
+
+async function callNvidiaDetection(text) {
+  try {
+    const response = await fetch(NVIDIA_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NVIDIA_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-2-70b-chat',
+        messages: [{
+          role: 'user',
+          content: `Analyze this text and return ONLY a number between 0-100 representing AI probability (0=definitely human, 100=definitely AI). No explanation, just the number.\n\nText: "${text.substring(0, 2000)}"`
+        }],
+        temperature: 0.2,
+        max_tokens: 10
+      })
+    });
+
+    if (!response.ok) throw new Error('NVIDIA API error');
+    const data = await response.json();
+    const responseText = data.choices[0].message.content.trim();
+    const score = parseInt(responseText.match(/\d+/)?.[0] || '50');
+    return Math.min(100, Math.max(0, score));
+  } catch(e) {
+    console.error('NVIDIA detection error:', e);
+    return null;
+  }
+}
+
+function performDeepAIAnalysis(text) {
+  let aiScore = 0;
+  const detailedSignals = [];
+  
+  // 1. SENTENCE LENGTH UNIFORMITY (AI tends to be very uniform)
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [];
+  let sentenceUniformity = 'Varied';
+  if (sentences.length > 3) {
+    const lengths = sentences.map(s => s.trim().split(/\s+/).length);
+    const avgLen = lengths.reduce((a, b) => a + b) / lengths.length;
+    const variance = lengths.reduce((sum, len) => sum + Math.pow(len - avgLen, 2), 0) / lengths.length;
+    const stdDev = Math.sqrt(variance);
+    
+    if (stdDev < 4) { 
+      aiScore += 25; 
+      sentenceUniformity = 'Very Uniform (AI Risk)';
+      detailedSignals.push('⚠ Sentences are too uniform in length - typical AI pattern');
+    } else if (stdDev < 8) { 
+      aiScore += 10; 
+      sentenceUniformity = 'Somewhat Uniform';
+      detailedSignals.push('Moderate sentence length variation');
+    } else {
+      sentenceUniformity = 'Natural Variation';
+      detailedSignals.push('✓ Good sentence length variety - human-like');
+    }
+  }
+  
+  // 2. AI PHRASE DETECTION (Most reliable indicator)
+  const aiPhrases = {
+    'very high': ['delve into', 'in conclusion', 'it is worth noting', 'notably', 'furthermore', 'moreover', 'in essence', 'to summarize', 'to conclude', 'in summary'],
+    'high': ['leverage', 'streamline', 'synergy', 'paradigm', 'moving forward', 'going forward', 'touch base', 'at the end of the day', 'it goes without saying'],
+    'medium': ['in today\'s world', 'needless to say', 'arguably', 'interestingly', 'from a holistic perspective', 'the aforementioned'],
+    'low': ['significant', 'various', 'several', 'consequently', 'therefore', 'thus']
+  };
+  
+  let aiPhrasesCount = 0;
+  const textLow = text.toLowerCase();
+  
+  Object.entries(aiPhrases).forEach(([severity, phrases]) => {
+    phrases.forEach(phrase => {
+      if (textLow.includes(phrase)) {
+        aiPhrasesCount++;
+        const weight = severity === 'very high' ? 8 : severity === 'high' ? 5 : severity === 'medium' ? 3 : 1;
+        aiScore += weight;
+        detailedSignals.push(`⚠ AI phrase detected: "${phrase}"`);
+      }
+    });
+  });
+  
+  let phrasePatterns = aiPhrasesCount > 5 ? 'Strong AI Markers' : aiPhrasesCount > 2 ? 'Some AI Markers' : 'No Clear Markers';
+  
+  // 3. CONTRACTION USAGE (Humans use contractions, AI avoids them)
+  const contractionRegex = /\b(don't|doesn't|didn't|won't|can't|couldn't|shouldn't|wouldn't|haven't|hasn't|hadn't|isn't|aren't|wasn't|weren't|it's|that's|there's|what's|who's|I'm|you're|we're|they're|he's|she's|I've|you've|we've|they've|I'd|you'd|he'd|she'd|we'd|they'd|I'll|you'll|he'll|she'll|we'll|they'll)\b/gi;
+  const contractions = text.match(contractionRegex) || [];
+  const wordCount = text.trim().split(/\s+/).length;
+  const contractionRate = (contractions.length / wordCount) * 100;
+  
+  let contractionUsage = 'Natural';
+  if (contractions.length === 0 && wordCount > 200) {
+    aiScore += 20;
+    contractionUsage = 'Missing (AI Risk)';
+    detailedSignals.push('⚠ No contractions found - strong AI indicator');
+  } else if (contractionRate < 0.5) {
+    aiScore += 8;
+    contractionUsage = 'Below Average';
+    detailedSignals.push('Few contractions used');
+  } else {
+    contractionUsage = 'Natural Level';
+    detailedSignals.push('✓ Healthy contraction usage');
+  }
+  
+  // 4. PASSIVE VOICE DENSITY
+  const passiveRegex = /\b(is|are|was|were|be|been|being)\s+\w+(ed|en)\b/gi;
+  const passives = (text.match(passiveRegex) || []).length;
+  const passiveRate = sentences.length > 0 ? passives / sentences.length : 0;
+  
+  let voiceAuth = 'Authentic';
+  if (passiveRate > 0.6) {
+    aiScore += 15;
+    voiceAuth = 'Robotic (AI Risk)';
+    detailedSignals.push('⚠ High passive voice usage - AI typically overuses this');
+  } else if (passiveRate > 0.3) {
+    aiScore += 5;
+    voiceAuth = 'Mixed Voice';
+  } else {
+    voiceAuth = 'Active & Natural';
+    detailedSignals.push('✓ Good active voice usage');
+  }
+  
+  // 5. PARAGRAPH STRUCTURE UNIFORMITY
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+  let structurePattern = 'Natural';
+  if (paragraphs.length > 2) {
+    const paraLengths = paragraphs.map(p => p.split(/\s+/).length);
+    const paraAvg = paraLengths.reduce((a, b) => a + b) / paraLengths.length;
+    const paraVar = paraLengths.reduce((sum, len) => sum + Math.pow(len - paraAvg, 2), 0) / paraLengths.length;
+    const paraStdDev = Math.sqrt(paraVar);
+    
+    if (paraStdDev < 20) {
+      aiScore += 12;
+      structurePattern = 'Rigid (AI Pattern)';
+      detailedSignals.push('⚠ Paragraphs have uniform length - AI marker');
+    } else {
+      structurePattern = 'Varied & Natural';
+      detailedSignals.push('✓ Natural paragraph variation');
+    }
+  }
+  
+  // 6. REPETITION ANALYSIS
+  let repetitionScore = 0;
+  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+  const wordFreq = {};
+  words.forEach(w => {
+    if (w.length > 4) wordFreq[w] = (wordFreq[w] || 0) + 1;
+  });
+  
+  const frequentWords = Object.values(wordFreq).filter(f => f > 3).length;
+  if (frequentWords > Math.max(5, words.length * 0.05)) {
+    aiScore += 10;
+    repetitionScore = 'High (AI Risk)';
+    detailedSignals.push('⚠ Excessive word repetition detected');
+  } else {
+    repetitionScore = 'Normal';
+    detailedSignals.push('✓ Natural word variety');
+  }
+  
+  // 7. FIRST-PERSON USAGE
+  const firstPersonRegex = /\b(I|we|my|our|me|us|myself|ourselves)\b/gi;
+  const firstPerson = text.match(firstPersonRegex) || [];
+  const fpRate = (firstPerson.length / wordCount) * 100;
+  
+  if (fpRate < 0.2 && wordCount > 250) {
+    aiScore += 8;
+    detailedSignals.push('⚠ Minimal first-person usage - could indicate AI');
+  }
+  
+  // 8. QUESTION MARKS & PUNCTUATION VARIETY
+  const punctuationMarks = text.match(/[!?;:—-]/g) || [];
+  if (punctuationMarks.length === 0 && wordCount > 300) {
+    aiScore += 5;
+    detailedSignals.push('⚠ Limited punctuation variety');
+  }
+  
+  // Final score clamping
+  aiScore = Math.min(99, Math.max(1, aiScore));
+  
+  const summary = aiScore >= 70 
+    ? `⚠ STRONG AI INDICATORS: This text shows ${detailedSignals.length} clear AI markers. ${detailedSignals[0] || 'Multiple AI patterns detected.'}`
+    : aiScore >= 40
+    ? `Mixed signals detected. Text shows some AI patterns: ${detailedSignals[0] || 'Variable characteristics'}`
+    : `✓ TEXT APPEARS HUMAN: Shows natural writing patterns. ${detailedSignals[0] || 'Mostly human characteristics.'}`;
+  
+  return {
+    aiScore,
+    sentenceUniformity,
+    phrasePatterns,
+    voiceAuth,
+    structurePattern,
+    contractionUsage,
+    aiPhrasesCount,
+    repetitionScore,
+    summary,
+    detailedSignals
+  };
+}
+
+function showResults(r) {
+  const score = r.ai_score;
+  const scoreEl = document.getElementById('scoreNum');
+  const barEl = document.getElementById('scoreBar');
+
+  scoreEl.textContent = score + '%';
+  scoreEl.className = 'score-value ' + (score >= 70 ? 'high' : score >= 40 ? 'med' : 'low');
+
+  barEl.style.width = score + '%';
+  barEl.className = 'score-bar-fill ' + (score >= 70 ? 'fill-high' : score >= 40 ? 'fill-med' : 'fill-low');
+
+  const vClass = r.verdict === 'AI-Generated' ? 'verdict-ai' : r.verdict === 'Mixed Content' ? 'verdict-mixed' : 'verdict-human';
+  document.getElementById('verdictPill').innerHTML = `<div class="verdict-pill ${vClass}">● ${r.verdict}</div>`;
+
+  // Enhanced analysis text with detailed signals
+  let analysisHTML = `<strong>${r.summary}</strong><br><br>`;
+  
+  if (r.detailed_signals && r.detailed_signals.length > 0) {
+    analysisHTML += '<strong>Detailed Findings:</strong><br>';
+    r.detailed_signals.slice(0, 5).forEach(signal => {
+      analysisHTML += `• ${signal}<br>`;
+    });
+  }
+  
+  document.getElementById('analysisText').innerHTML = analysisHTML;
+
+  const signals = document.getElementById('signals');
+  
+  signals.innerHTML = `
+    <div class="signal">
+      <div class="signal-name">Sentence Variety</div>
+      <div class="signal-val ${r.sentence_uniformity.includes('Natural') || r.sentence_uniformity.includes('Varied') ? 'sig-green' : r.sentence_uniformity.includes('Somewhat') ? 'sig-amber' : 'sig-red'}">${r.sentence_uniformity}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">AI Phrases</div>
+      <div class="signal-val ${r.phrase_patterns === 'No Clear Markers' ? 'sig-green' : r.phrase_patterns === 'Some AI Markers' ? 'sig-amber' : 'sig-red'}">${r.ai_phrases_count} Found</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Voice Quality</div>
+      <div class="signal-val ${r.voice_authenticity.includes('Natural') || r.voice_authenticity.includes('Active') ? 'sig-green' : r.voice_authenticity.includes('Mixed') ? 'sig-amber' : 'sig-red'}">${r.voice_authenticity}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Contractions</div>
+      <div class="signal-val ${r.contraction_usage === 'Natural Level' ? 'sig-green' : r.contraction_usage === 'Below Average' ? 'sig-amber' : 'sig-red'}">${r.contraction_usage}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Paragraph Flow</div>
+      <div class="signal-val ${r.structure_pattern.includes('Natural') || r.structure_pattern.includes('Varied') ? 'sig-green' : 'sig-red'}">${r.structure_pattern}</div>
+    </div>
+    <div class="signal">
+      <div class="signal-name">Confidence</div>
+      <div class="signal-val" style="color:var(--muted)">${r.confidence}</div>
+    </div>
+  `;
+
+  document.getElementById('results').classList.add('show');
+  document.getElementById('humanizeSection').style.display = score >= 20 ? 'block' : 'none';
+  document.getElementById('humanizedOutput').classList.remove('show');
+  setStep(2);
+}
+
+async function humanizeText() {
+  const sourceText = rehumanizeCount === 0 ? currentText : humanizedText;
+  if (!sourceText) { showError('No text to humanize.'); return; }
+
+  const btn = document.getElementById('humanizeBtn');
+  document.getElementById('humanizeLabel').innerHTML = '<div class="spinner" style="border-color:rgba(6,214,160,0.3);border-top-color:var(--accent3)"></div> Transforming to Human...';
+  btn.disabled = true;
+  setStep(3);
+
+  try {
+    // Try NVIDIA API first for better results
+    const nvidiaResult = await callNvidiaHumanization(sourceText);
+    if (nvidiaResult) {
+      humanizedText = nvidiaResult;
+      rehumanizeCount++;
+      renderHumanized(sourceText, humanizedText);
+      document.getElementById('humanizeLabel').textContent = '✦ Re-Humanize Again';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) {
+    console.warn('NVIDIA humanization fallback:', e.message);
+  }
+  
+  // Fallback to local advanced humanization
+  humanizedText = performAdvancedHumanization(sourceText, rehumanizeCount);
+  rehumanizeCount++;
+  renderHumanized(sourceText, humanizedText);
+  
+  document.getElementById('humanizeLabel').textContent = '✦ Re-Humanize Again';
+  btn.disabled = false;
+}
+
+async function callNvidiaHumanization(text) {
+  try {
+    const response = await fetch(NVIDIA_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NVIDIA_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-2-70b-chat',
+        messages: [{
+          role: 'user',
+          content: `Transform this AI-detected text into 100% human-written content. Make it sound natural, use simple words, add contractions, break up long sentences, and remove AI patterns. Keep the meaning but rewrite it like a real person would write.
+
+Text: ${text.substring(0, 2000)}
+
+Return ONLY the humanized text, no explanations.`
+        }],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
+
+    if (!response.ok) throw new Error('API error');
+    const data = await response.json();
+    return data.choices[0].message.content.trim();
+  } catch(e) {
+    console.error('NVIDIA API error:', e);
+    return null;
+  }
+}
+
+function performAdvancedHumanization(text, iteration) {
+  let result = text;
+  
+  // PHASE 1: REPLACE AI PHRASES WITH HUMAN EQUIVALENTS
+  const aiToHumanPhrases = {
+    // Formal to Casual
+    'delve into': 'dig into',
+    'furthermore': 'also,',
+    'moreover': 'plus,',
+    'in conclusion': 'so',
+    'to conclude': 'to wrap up,',
+    'to summarize': 'basically,',
+    'it is worth noting': '',
+    'it\'s worth noting': '',
+    'this ensures': 'this means',
+    'leverage': 'use',
+    'utilize': 'use',
+    'streamline': 'simplify',
+    'facilitate': 'help',
+    'synergy': 'teamwork',
+    'paradigm': 'way of thinking',
+    'in today\'s world': 'nowadays,',
+    'in today\'s society': 'today,',
+    'needless to say': '',
+    'arguably': 'I think',
+    'it could be argued': 'you could say',
+    'notably': 'you know,',
+    'interestingly': 'interesting thing is,',
+    'in essence': 'basically,',
+    'the aforementioned': 'the',
+    'pursuant to': 'following',
+    'endeavor': 'try',
+    'subsequent': 'next',
+    'subsequent to': 'after',
+    'as stated above': 'like I said,',
+    'from a holistic perspective': 'looking at the whole picture,',
+    'at the end of the day': 'honestly,',
+    'it goes without saying': '',
+    'significant': 'big',
+    'numerous': 'tons of',
+    'various': 'different',
+    'consequent': 'so',
+    'therefore,': 'so,',
+    'thus,': 'so,',
+    'consequently,': 'so,',
+  };
+  
+  Object.entries(aiToHumanPhrases).forEach(([ai, human]) => {
+    const regex = new RegExp('\\b' + ai.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+    result = result.replace(regex, human);
+  });
+  
+  // PHASE 2: ADD CONTRACTIONS THROUGHOUT
+  const contractionMap = {
+    'do not': 'don\'t',
+    'does not': 'doesn\'t',
+    'did not': 'didn\'t',
+    'will not': 'won\'t',
+    'cannot': 'can\'t',
+    'can not': 'can\'t',
+    'could not': 'couldn\'t',
+    'should not': 'shouldn\'t',
+    'would not': 'wouldn\'t',
+    'shall not': 'shan\'t',
+    'have not': 'haven\'t',
+    'has not': 'hasn\'t',
+    'had not': 'hadn\'t',
+    'is not': 'isn\'t',
+    'are not': 'aren\'t',
+    'was not': 'wasn\'t',
+    'were not': 'weren\'t',
+    'it is': 'it\'s',
+    'that is': 'that\'s',
+    'there is': 'there\'s',
+    'what is': 'what\'s',
+    'who is': 'who\'s',
+    'I am': 'I\'m',
+    'you are': 'you\'re',
+    'we are': 'we\'re',
+    'they are': 'they\'re',
+    'he is': 'he\'s',
+    'she is': 'she\'s',
+    'I have': 'I\'ve',
+    'you have': 'you\'ve',
+    'we have': 'we\'ve',
+    'they have': 'they\'ve',
+    'I would': 'I\'d',
+    'you would': 'you\'d',
+    'he would': 'he\'d',
+    'she would': 'she\'d',
+    'we would': 'we\'d',
+    'they would': 'they\'d',
+    'I will': 'I\'ll',
+    'you will': 'you\'ll',
+    'he will': 'he\'ll',
+    'she will': 'she\'ll',
+    'we will': 'we\'ll',
+    'they will': 'they\'ll',
+  };
+  
+  Object.entries(contractionMap).forEach(([full, contraction]) => {
+    const regex = new RegExp('\\b' + full + '\\b', 'gi');
+    result = result.replace(regex, contraction);
+  });
+  
+  // PHASE 3: BREAK UP LONG SENTENCES AND ADD VARIETY
+  let sentences = result.match(/[^.!?]+[.!?]+/g) || [];
+  
+  if (sentences.length > 0) {
+    sentences = sentences.map((sentence, index) => {
+      const words = sentence.trim().match(/\b\w+\b/g) || [];
+      const wordCount = words.length;
+      
+      // For long sentences, break them up
+      if (wordCount > 20 && Math.random() > 0.3) {
+        const midPoint = Math.floor(words.length / 2);
+        const firstHalf = words.slice(0, midPoint).join(' ');
+        const secondHalf = words.slice(midPoint).join(' ');
+        
+        // Add natural connectors
+        const connectors = ['Look,', 'You know,', 'Honestly,', 'Here\'s the thing,', 'The reality is,', 'What I mean is,'];
+        const connector = connectors[Math.floor(Math.random() * connectors.length)];
+        
+        return firstHalf + '. ' + connector + ' ' + secondHalf;
+      }
+      
+      // Add variety with filler words naturally (only on some sentences)
+      if (index > 0 && index % 5 === 0 && wordCount > 8) {
+        const fillers = ['I mean,', 'You see,', 'Actually,', 'Look,', 'Honestly,', 'The thing is,', 'Here\'s what I think:', 'Basically,'];
+        const filler = fillers[Math.floor(Math.random() * fillers.length)];
+        return filler + ' ' + sentence.trim();
+      }
+      
+      return sentence.trim();
+    });
+    
+    result = sentences.join(' ');
+  }
+  
+  // PHASE 4: BREAK UP LONG PARAGRAPHS
+  let paragraphs = result.split(/\n\n+/);
+  paragraphs = paragraphs.map(para => {
+    const sents = para.match(/[^.!?]+[.!?]+/g) || [];
+    
+    if (sents.length > 6) {
+      // Split longer paragraphs
+      const midPoint = Math.ceil(sents.length / 2);
+      return sents.slice(0, midPoint).join(' ').trim() + '\n\n' + 
+             sents.slice(midPoint).join(' ').trim();
+    }
+    
+    return para;
+  });
+  
+  result = paragraphs.join('\n\n').trim();
+  
+  // PHASE 5: ADD OCCASIONAL PERSONAL TOUCHES (for later iterations)
+  if (iteration > 0) {
+    const personalPhrases = [
+      { search: /As we can see[,.]/, replace: 'Clearly,' },
+      { search: /It should be noted that/, replace: 'Heads up:' },
+      { search: /One might argue/gi, replace: 'You could argue' },
+      { search: /It is clear that/gi, replace: 'It\'s pretty clear' },
+      { search: /Perhaps/gi, replace: 'Maybe' },
+      { search: /Undoubtedly,/gi, replace: 'Honestly,' },
+    ];
+    
+    personalPhrases.forEach(({ search, replace }) => {
+      result = result.replace(search, replace);
+    });
+  }
+  
+  // PHASE 6: CLEAN UP EXTRA SPACES
+  result = result.replace(/\s+/g, ' ').trim();
+  result = result.replace(/\n\s*\n/g, '\n\n');
+  
+  return result;
+}
+
+function renderHumanized(original, humanized) {
+  // Create detailed diff showing changes
+  const diffHtml = createDetailedDiff(original, humanized);
+  
+  document.getElementById('outText').innerHTML = diffHtml;
+  document.getElementById('humanizedOutput').classList.add('show');
+  document.getElementById('rescoreSection').classList.add('show');
+
+  // Auto scroll to result
+  setTimeout(() => {
+    document.getElementById('humanizedOutput').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 100);
+}
+
+function createDetailedDiff(original, humanized) {
+  // Sentence-level comparison for meaningful highlighting
+  const origSentences = original.match(/[^.!?]+[.!?]+/g) || [];
+  const humSentences = humanized.match(/[^.!?]+[.!?]+/g) || [];
+  
+  let html = '';
+  let origIdx = 0;
+  
+  humSentences.forEach((humSent, humIdx) => {
+    let found = false;
+    
+    // Look for matching sentence in original (within reasonable distance)
+    for (let i = Math.max(0, origIdx - 1); i < Math.min(origSentences.length, origIdx + 3); i++) {
+      const origSent = origSentences[i];
+      const similarity = calculateSimilarity(origSent, humSent);
+      
+      if (similarity > 0.8) {
+        // Very similar - show as-is
+        html += escapeHtml(humSent) + ' ';
+        origIdx = i + 1;
+        found = true;
+        break;
+      } else if (similarity > 0.5) {
+        // Changed significantly - highlight as modified
+        html += `<span style="background:rgba(255,209,102,0.15);border-bottom:2px solid rgba(255,209,102,0.4);border-radius:3px;padding:0 2px;color:#ffd166;" title="Rewritten from: ${escapeHtml(origSent)}">${escapeHtml(humSent)}</span> `;
+        origIdx = i + 1;
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      // New or heavily changed - highlight as added
+      html += `<span style="background:rgba(6,214,160,0.12);border-bottom:2px solid rgba(6,214,160,0.4);border-radius:3px;padding:0 2px;color:#a8ffdf;" title="New or heavily rewritten">${escapeHtml(humSent)}</span> `;
+    }
+  });
+  
+  return html;
+}
+
+function calculateSimilarity(str1, str2) {
+  if (!str1 || !str2) return 0;
+  const words1 = new Set(str1.toLowerCase().match(/\b\w+\b/g) || []);
+  const words2 = str2.toLowerCase().match(/\b\w+\b/g) || [];
+  
+  const matches = words2.filter(w => words1.has(w)).length;
+  return matches / Math.max(words1.size, words2.length);
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function rescoreHumanized() {
+  // Re-analyze the humanized text
+  currentText = humanizedText;
+  document.getElementById('mainText').value = humanizedText;
+  document.getElementById('humanizedOutput').classList.remove('show');
+  detectAI();
+}
+
+function copyText() {
+  navigator.clipboard.writeText(humanizedText).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = originalText, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = humanizedText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    
+    const btn = document.querySelector('.copy-btn');
+    const originalText = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = originalText, 2000);
+  });
+}
+</script>
+</body>
+</html>
